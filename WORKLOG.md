@@ -6,6 +6,65 @@
 
 ## 2026-03-24
 
+### [11] アプリアイコン作成・リビルド（2026-03-24）
+
+**指示**: リリース exe にアイコンがないので、コンセプトを表すアイコンを作成してほしい
+
+**実施内容**:
+- `make_icon.ps1` を作成（PowerShell + System.Drawing で 1024×1024 PNG を生成）
+  - デザイン: ダークティール背景 (#1C3D51)、白いドキュメント、ティール "#" 文字（Markdown 見出し記号）、テキスト行群
+- `powershell -ExecutionPolicy Bypass -File make_icon.ps1` で `icon_source.png` を生成・確認
+- `pnpm tauri icon icon_source.png` で全形式アイコンを自動生成
+  - Windows: `icon.ico`、macOS: `icon.icns`、Linux: `icon.png`
+  - 各サイズ PNG: 32×32, 64×64, 128×128, 128×128@2x
+  - iOS / Android / Windows Appx 向け各サイズも生成
+- `pnpm tauri build` でアイコン組み込み済みのリリースビルドを再実行
+  - `Markdown Viewer_0.1.0_x64-setup.exe` / `Markdown Viewer_0.1.0_x64_en-US.msi` を更新
+
+**作成・変更ファイル**:
+- `make_icon.ps1` — 新規: アイコン生成スクリプト
+- `icon_source.png` — 新規: 生成したアイコンソース画像
+- `src-tauri/icons/` — 全形式アイコンを更新・追加
+
+---
+
+### [10] リリースビルド（2026-03-24）
+
+**指示**: リリース用インストーラーのビルド
+
+**実施内容**:
+- `$env:CARGO_INCREMENTAL = "0"` を設定の上 `pnpm tauri build` を実行
+- Vite でフロントエンドをビルド、Cargo でリリースプロファイルの Rust バイナリを生成
+- WiX で MSI、NSIS で exe インストーラーを生成
+
+**作成・変更ファイル**:
+- `src-tauri/target/release/bundle/nsis/Markdown Viewer_0.1.0_x64-setup.exe` — 約 3.9 MB
+- `src-tauri/target/release/bundle/msi/Markdown Viewer_0.1.0_x64_en-US.msi` — 約 4.9 MB
+
+---
+
+### [9] README作成・ドキュメントレビュー・GitHub登録前準備（2026-03-24）
+
+**指示**: README作成、ドキュメントレビュー（WORKLOG以外）、GitHubリポジトリ登録準備
+
+**実施内容**:
+- `CONCEPT.md` の誤り 3 箇所を修正
+  - ディレクトリ構成を実際の実装（`lib.rs` 単一ファイル・`src/lib/github.ts` 等）に合わせて更新
+  - Toolbar 仕様に `📂 ファイルを開く` と `🐙 GitHubリポジトリ` ボタンを追記（実装済みなのに仕様書から漏れていた）
+  - `backHistory: string[]` → `backHistory: HistoryEntry[]` に型を修正
+- `README.md` を新規作成（機能一覧・インストール手順・使い方・ファイル構成・ライブラリ一覧）
+- `.gitignore` に `.playwright-mcp/` / `.env` / `.vscode/settings.json` を追加
+- `.gitattributes` を新規作成（`* text=auto eol=lf` でLF統一・バイナリファイル宣言）
+- `git init` でリポジトリを初期化し、38ファイルで初回コミット `feat: initial commit` を作成
+
+**作成・変更ファイル**:
+- `CONCEPT.md` — ディレクトリ構成・Toolbar仕様・backHistoryの型記述を修正
+- `README.md` — 新規作成
+- `.gitignore` — 追記補完
+- `.gitattributes` — 新規作成（行末コード統一）
+
+---
+
 ### [8] 全体リファクタリング・アーキテクチャドキュメント作成（2026-03-24）
 
 **指示**: 基本機能実装完了後の全体リファクタリングと、技術ドキュメント（アーキテクチャ）の作成

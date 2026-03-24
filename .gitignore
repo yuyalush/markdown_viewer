@@ -13,3 +13,6 @@ dist/
 
 # Playwright MCP ツール生成ファイル
 .playwright-mcp/
+
+# アイコン生成用ソースファイル
+icon_source.png
