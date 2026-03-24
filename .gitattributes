@@ -1,0 +1,12 @@
+# LF を標準の行末コードとして使用する
+* text=auto eol=lf
+
+# バイナリファイル
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

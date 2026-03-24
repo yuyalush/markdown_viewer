@@ -1,0 +1,110 @@
+<script lang="ts">
+  interface Props {
+    darkMode: boolean;
+    sidebarOpen: boolean;
+    canGoBack: boolean;
+    canGoForward: boolean;
+    showSearch: boolean;
+    showSettings: boolean;
+    isGithubMode: boolean;
+    onToggleDark: () => void;
+    onToggleSidebar: () => void;
+    onOpenFile: () => void;
+    onGoBack: () => void;
+    onGoForward: () => void;
+    onToggleSearch: () => void;
+    onToggleSettings: () => void;
+    onOpenGithubRepo: () => void;
+  }
+
+  const {
+    darkMode,
+    sidebarOpen,
+    canGoBack,
+    canGoForward,
+    showSearch,
+    showSettings,
+    isGithubMode,
+    onToggleDark,
+    onToggleSidebar,
+    onOpenFile,
+    onGoBack,
+    onGoForward,
+    onToggleSearch,
+    onToggleSettings,
+    onOpenGithubRepo,
+  }: Props = $props();
+</script>
+
+<header class="toolbar">
+  <div class="left">
+    <button onclick={onToggleSidebar} title={sidebarOpen ? "サイドバーを閉じる" : "サイドバーを開く"}>
+      ☰
+    </button>
+    <button onclick={onGoBack} disabled={!canGoBack} title="前のファイルに戻る">←</button>
+    <button onclick={onGoForward} disabled={!canGoForward} title="次のファイルに進む">→</button>
+  </div>
+  <div class="right">
+    <button onclick={onOpenFile} title="ファイルを開く">📂</button>
+    <button onclick={onOpenGithubRepo} class:active={isGithubMode} title="GitHubリポジトリを開く" style="padding: 4px 6px; line-height: 0">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+    </button>
+    <button onclick={onToggleSearch} class:active={showSearch} title="ドキュメント内検索">🔍</button>
+    <button onclick={onToggleDark} title={darkMode ? "ライトモードに切替" : "ダークモードに切替"}>
+      {darkMode ? "🌙" : "☀"}
+    </button>
+    <button onclick={onToggleSettings} class:active={showSettings} title="表示設定">⚙</button>
+  </div>
+</header>
+
+<style>
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    padding: 0 8px;
+    background: var(--toolbar-bg, #fff);
+    border-bottom: 1px solid var(--toolbar-border, #d0d7de);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .left,
+  .right {
+    display: flex;
+    gap: 2px;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    color: var(--toolbar-text, #24292f);
+    line-height: 1;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--toolbar-btn-hover, rgba(0, 0, 0, 0.08));
+  }
+
+  button.active {
+    background: var(--toolbar-btn-hover, rgba(0, 0, 0, 0.08));
+    color: var(--sidebar-active-text);
+  }
+
+  button.active {
+    background: var(--toolbar-btn-hover, rgba(0, 0, 0, 0.08));
+    color: var(--sidebar-active-text);
+  }
+
+  button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+</style>

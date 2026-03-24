@@ -1,0 +1,15 @@
+target/
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# 環境変数・ローカル設定
+.env
+.env.local
+
+# エディタ
+.vscode/settings.json
+
+# Playwright MCP ツール生成ファイル
+.playwright-mcp/
