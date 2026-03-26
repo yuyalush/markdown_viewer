@@ -1,0 +1,15 @@
+# ARM64 Windows でビルドする場合のみ必要なリンカー設定です。
+# Intel / x64 環境ではこのファイルは不要です（作成しないでください）。
+#
+# セットアップ手順:
+#   1. このファイルを config.toml にコピーする
+#   2. lld-link.exe のパスを実際のインストール先に合わせて書き換える
+#   3. dev-setup-arm64.ps1 を使うと自動で設定されます（推奨）
+#
+# LLVM のインストール先の例:
+#   - C:\Program Files\LLVM\bin\lld-link.exe
+#   - C:\Users\<username>\LLVM\bin\lld-link.exe
+#   - C:\Users\<username>\OneDrive - Microsoft\Documents\LLVM\bin\lld-link.exe
+
+[target.aarch64-pc-windows-msvc]
+linker = "C:\\path\\to\\LLVM\\bin\\lld-link.exe"

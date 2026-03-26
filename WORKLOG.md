@@ -4,6 +4,67 @@
 
 ---
 
+## 2026-03-26
+
+### [1] 開発環境セットアップ（2026-03-26）
+
+**指示**: コンパイルできるように環境のセットアップをしてください。
+
+**実施内容**:
+- `pnpm 10.33.0` を npm グローバルインストール
+- `rustup 1.29.0` + `Rust stable 1.94.0 (aarch64-pc-windows-msvc)` を winget でインストール
+- Rust ツールチェーンの部分インストール問題を `rustup update stable` で修復
+- Visual Studio Build Tools 2022 を winget でインストール（VCTools ワークロード込み）
+- Visual Studio Installer で `Microsoft.VisualStudio.Component.VC.Tools.ARM64` を追加インストール（ARM64 ライブラリ取得）
+- LLVM 22.1.1 を winget でインストール（`lld-link.exe` リンカー取得）
+- `~/.cargo/config.toml` と `src-tauri/.cargo/config.toml` に ARM64 向け lld-link リンカーを設定
+- `package.json` に `pnpm.onlyBuiltDependencies: ["esbuild"]` を追加（esbuild ビルドスクリプト承認）
+- `pnpm install` で全 npm 依存パッケージをインストール
+- `pnpm tauri build` でビルド成功を確認
+
+**ビルド成果物**:
+- `src-tauri/target/release/bundle/msi/Markdown Viewer_0.1.0_arm64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Markdown Viewer_0.1.0_arm64-setup.exe`
+
+**作成・変更ファイル**:
+- `package.json` — pnpm.onlyBuiltDependencies を追加
+- `src-tauri/.cargo/config.toml` — ARM64 リンカー設定を追加（新規作成）
+- `~/.cargo/config.toml` — ARM64/x64 リンカーパスを設定
+- `dev-setup.ps1` — ビルド環境変数をセットアップするスクリプト（新規作成）
+
+---
+
+### [2] ARM64/Intel 共存開発対応（2026-03-26）
+
+**指示**: ARM64/Intel 両環境での同時開発を考慮した対応を実施。
+
+**実施内容**:
+- `src-tauri/.cargo/config.toml` を `.gitignore` に追加（マシン固有のリンカーパスをリポジトリから除外）
+- `src-tauri/.cargo/config.toml.example` を新規作成（ARM64 リンカー設定のテンプレートとしてコミット対象に）
+- `dev-setup.ps1` を `dev-setup-arm64.ps1` にリネームし内容を汎用化
+  - `vswhere.exe` + `Microsoft.VCToolsVersion.default.txt` で MSVC バージョンを動的検索
+  - Windows SDK バージョンも動的検索（ハードコード廃止）
+  - LLVM インストール先を複数候補から自動探索（OneDrive パス含む）
+  - ユーザー名のハードコードを廃止
+- `README.md` に「ARM64 (Windows on ARM) 環境でのビルド」セクションを追加
+
+**コミット対象まとめ**:
+- ✅ `package.json` — esbuild ビルドスクリプト承認設定
+- ✅ `WORKLOG.md` — 作業ログ
+- ✅ `dev-setup-arm64.ps1` — ARM64 専用セットアップスクリプト（汎用化済み）
+- ✅ `src-tauri/.cargo/config.toml.example` — リンカー設定テンプレート
+- ✅ `.gitignore` — `src-tauri/.cargo/config.toml` を追加
+- ✅ `README.md` — ARM64 ビルド手順を追記
+- ❌ `src-tauri/.cargo/config.toml` — マシン固有のため .gitignore で除外
+
+**作成・変更ファイル**:
+- `dev-setup-arm64.ps1` — 新規作成（旧 dev-setup.ps1 をリネーム・汎用化）
+- `src-tauri/.cargo/config.toml.example` — 新規作成（ARM64 リンカー設定テンプレート）
+- `.gitignore` — `src-tauri/.cargo/config.toml` を追加
+- `README.md` — ARM64 ビルド手順セクションを追加
+
+---
+
 ## 2026-03-24
 
 ### [12] アイコンが白い四角になる問題の修正（2026-03-24）

@@ -65,6 +65,36 @@ pnpm tauri build
 > **Windows ビルドの注意点:**  
 > `CARGO_INCREMENTAL=0` を設定しないとインクリメンタルビルドで OS error 32 が発生する場合があります。
 
+### ARM64 (Windows on ARM) 環境でのビルド
+
+Snapdragon X / Copilot+ PC など ARM64 Windows でビルドする場合、追加のセットアップが必要です。
+
+**追加で必要なツール:**
+
+| ツール | インストールコマンド |
+|---|---|
+| VS Build Tools 2022 (C++ ARM64) | `winget install Microsoft.VisualStudio.2022.BuildTools` |
+| VS ARM64 ライブラリ | VS Installer で `Microsoft.VisualStudio.Component.VC.Tools.ARM64` を追加 |
+| LLVM (`lld-link`) | `winget install LLVM.LLVM` |
+
+**ビルド手順:**
+
+```powershell
+# 1. セットアップスクリプトを実行（ターミナルを開くたびに必要）
+. .\dev-setup-arm64.ps1
+
+# 2. 通常通りビルド
+pnpm tauri dev
+pnpm tauri build
+```
+
+> **仕組み:** ARM64 Windows には MSVC のネイティブ ARM64 リンカーが標準添付されていないため、
+> LLVM の `lld-link.exe` を代替リンカーとして使用します。
+> `dev-setup-arm64.ps1` がビルド環境変数と `~/.cargo/config.toml` を自動設定します。
+>
+> `src-tauri/.cargo/config.toml` はマシン固有設定のため `.gitignore` に含まれています。
+> 設定例は [`src-tauri/.cargo/config.toml.example`](src-tauri/.cargo/config.toml.example) を参照してください。
+
 ---
 
 ## 使い方

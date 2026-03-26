@@ -16,3 +16,7 @@ dist/
 
 # アイコン生成用ソースファイル
 icon_source.png
+
+# マシン固有の cargo リンカー設定（ARM64 環境で dev-setup-arm64.ps1 が自動生成）
+# テンプレートは src-tauri/.cargo/config.toml.example を参照
+src-tauri/.cargo/config.toml
