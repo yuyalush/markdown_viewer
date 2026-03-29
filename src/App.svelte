@@ -413,6 +413,7 @@
       content={markdownContent}
       sanitize={isGithubMode}
       {darkMode}
+      currentFilePath={filePath}
       searchQuery={showSearch ? searchQuery : ""}
       searchCaseSensitive={searchCaseSensitive}
       onOpenRelativeFile={handleOpenRelativeFile}

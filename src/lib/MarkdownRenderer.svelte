@@ -1,14 +1,17 @@
 <script lang="ts">
   import { renderMarkdown, renderMarkdownSafe } from "./markdownParser";
   import { openUrl } from "@tauri-apps/plugin-opener";
+  import { convertFileSrc } from "@tauri-apps/api/core";
   import mermaid from "mermaid";
   import type { Heading } from "./Sidebar.svelte";
+  import { resolveLocalPath } from "./pathUtils";
 
   // Mermaid 初期化（一度だけ）
   mermaid.initialize({ startOnLoad: false, theme: "default" });
 
   interface Props {
     content: string;
+    currentFilePath?: string | null;
     searchQuery?: string;
     searchCaseSensitive?: boolean;
     sanitize?: boolean;
@@ -21,6 +24,7 @@
 
   const {
     content,
+    currentFilePath = null,
     searchQuery = "",
     searchCaseSensitive = false,
     sanitize = false,
@@ -176,6 +180,26 @@
     if (mermaidEls.length === 0) return;
     mermaidEls.forEach((el) => el.removeAttribute("data-processed"));
     mermaid.run({ nodes: Array.from(mermaidEls) as HTMLElement[] }).catch(() => {});
+  });
+
+  // 相対パス画像を asset:// URL に変換（ローカルファイルモード時のみ）
+  $effect(() => {
+    const _track = renderedHtml;
+    if (!containerEl || !currentFilePath) return;
+    containerEl.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+      // 外部URL・データURI・既変換済みはスキップ
+      if (
+        src.startsWith("http://") ||
+        src.startsWith("https://") ||
+        src.startsWith("data:") ||
+        src.startsWith("asset://") ||
+        src.startsWith("//")
+      ) return;
+      const absolutePath = resolveLocalPath(currentFilePath, src);
+      img.src = convertFileSrc(absolutePath);
+    });
   });
 
   /** スクロール位置を保持したままコンテンツを差し替える */

@@ -4,6 +4,47 @@
 
 ---
 
+## 2026-03-29
+
+### [1] 相対パスSVG/画像が表示されない問題を修正（2026-03-29）
+
+**指示**: `![サービスアーキテクチャ](architecture.svg)` のような相対パス画像が壊れたアイコンになるのを修正してほしい。
+
+**実施内容**:
+- 原因: `<img src="相対パス">` が Tauri アプリのオリジン基準で解決されるため、Markdown ファイルと同じフォルダにある実ファイルに到達できない
+- `src-tauri/tauri.conf.json` の `app.security` に `assetProtocol`（`enable: true`, `scope: ["**"]`）を追加し、`asset://` プロトコルを有効化
+- `src/App.svelte` の `<MarkdownRenderer>` に `currentFilePath={filePath}` prop を追加
+- `src/lib/MarkdownRenderer.svelte` に以下を追加:
+  - `convertFileSrc` を `@tauri-apps/api/core` からインポート
+  - `resolveLocalPath` を `./pathUtils` からインポート
+  - Props に `currentFilePath?: string | null` を追加
+  - `$effect` を追加: `renderedHtml` / `currentFilePath` 変化時に `<img>` の相対パス src を絶対パスに解決し `convertFileSrc()` で `asset://` URL に変換
+- SVG だけでなく PNG/JPG/GIF/WebP などすべてのローカル画像に対応
+- 外部 URL (`http://`, `https://`)・データ URI (`data:`)・既変換済み (`asset://`) はスキップ
+
+**作成・変更ファイル**:
+- `src-tauri/tauri.conf.json` — `app.security.assetProtocol` セクションを追加
+- `src/App.svelte` — `<MarkdownRenderer>` に `currentFilePath={filePath}` を追加
+- `src/lib/MarkdownRenderer.svelte` — インポート追加・Props 追加・画像変換 `$effect` 追加
+
+---
+
+### [2] v0.1.0 リリースビルド作成（2026-03-29）
+
+**指示**: リリースの作成を行ってください。
+
+**実施内容**:
+- `pnpm tauri build` を実行しリリースビルドを生成
+- フロントエンド（Vite）のプロダクションビルド完了後、Rust releaseプロファイルでコンパイル
+- MSI インストーラーおよび NSIS セットアップ EXE を生成
+
+**作成・変更ファイル**:
+- `src-tauri/target/release/markdown-viewer.exe` — リリース実行ファイル
+- `src-tauri/target/release/bundle/msi/Markdown Viewer_0.1.0_x64_en-US.msi` — MSI インストーラー
+- `src-tauri/target/release/bundle/nsis/Markdown Viewer_0.1.0_x64-setup.exe` — NSIS セットアップ EXE
+
+---
+
 ## 2026-03-26
 
 ### [1] 開発環境セットアップ（2026-03-26）
