@@ -4,6 +4,43 @@
 
 ---
 
+## 2026-03-30
+
+### [2] バージョン 0.1.3 へのバンプと macOS 対応リリースタグ（2026-03-30）
+
+**指示**: コミットを 0.1.3 にして、macOS 版対応としてリリースタグをつけてほしい（0.1.2 から修正）
+
+**実施内容**:
+- `package.json`、`src-tauri/Cargo.toml`、`src-tauri/tauri.conf.json` のバージョンを 0.1.1 → 0.1.3 に更新
+- `git commit --amend` で直前のコミットを書き換え
+- リモート・ローカルの `v0.1.2` タグを削除
+- `v0.1.3` annotated タグを作成し `git push --force origin master` および `git push origin v0.1.3` を実行
+
+**作成・変更ファイル**:
+- `package.json` — version 0.1.3
+- `src-tauri/Cargo.toml` — version 0.1.3
+- `src-tauri/tauri.conf.json` — version 0.1.3
+
+---
+
+### [1] ローカル開発環境のセットアップ（2026-03-30）
+
+**指示**: このリポジトリの開発を行えるように、ローカル環境を整備して
+
+**実施内容**:
+- Node.js 25.8.2 を Homebrew でインストール
+- pnpm 10.33.0 を npm でグローバルインストール
+- Rust toolchain 1.94.1 を rustup でインストール
+- `pnpm install` で全 JS/TS 依存関係をインストール
+- `cargo fetch` で Rust 依存クレートを取得、`cargo check` でコンパイルエラーなしを確認
+- `pnpm test` 実行時に発覚した pathUtils のバグ（Unix パスで `//` になる問題）を合わせて修正
+- 全30テスト通過を確認
+
+**作成・変更ファイル**:
+- `src/lib/pathUtils.ts` — Unix パスで `file:////` となる二重スラッシュバグを修正
+
+---
+
 ## 2026-03-29
 
 ### [1] pathUtils.ts: macOS/Linux でパス先頭の "/" が欠落するバグを修正（2026-03-29）
