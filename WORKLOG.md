@@ -106,6 +106,24 @@
 
 ---
 
+### [6] v0.1.1 ARM64 リリースビルド作成（2026-03-29）
+
+**指示**: ARM64 版のリリース作成も実施してください。
+
+**実施内容**:
+- `rustup target add aarch64-pc-windows-msvc` で ARM64 Rust ターゲットを追加
+- VS Build Tools に ARM64 クロスコンパイルツール（`Microsoft.VisualStudio.Component.VC.Tools.ARM64`）を追加インストール（vs_installer.exe modify コマンドで）
+- `pnpm tauri build --target aarch64-pc-windows-msvc` で ARM64 向けリリースビルドを実行
+- Rust release プロファイルでクロスコンパイル完了（約 54 秒）
+- MSI インストーラーおよび NSIS セットアップ EXE を生成
+
+**作成・変更ファイル**:
+- `src-tauri/target/aarch64-pc-windows-msvc/release/markdown-viewer.exe` — ARM64 リリース実行ファイル
+- `src-tauri/target/aarch64-pc-windows-msvc/release/bundle/msi/Markdown Viewer_0.1.1_arm64_en-US.msi` — ARM64 MSI インストーラー
+- `src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/Markdown Viewer_0.1.1_arm64-setup.exe` — ARM64 NSIS セットアップ EXE
+
+---
+
 ## 2026-03-26
 
 ### [1] 開発環境セットアップ（2026-03-26）
