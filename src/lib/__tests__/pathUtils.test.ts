@@ -27,4 +27,19 @@ describe("resolveLocalPath", () => {
     // URL 解決後に decodeURIComponent が適用される
     expect(result).toContain("image.png");
   });
+
+  it("Unix: 同じディレクトリの相対ファイル", () => {
+    expect(resolveLocalPath("/home/user/docs/README.md", "image.png"))
+      .toBe("/home/user/docs/image.png");
+  });
+
+  it("Unix: サブディレクトリの相対ファイル", () => {
+    expect(resolveLocalPath("/home/user/docs/README.md", "assets/logo.svg"))
+      .toBe("/home/user/docs/assets/logo.svg");
+  });
+
+  it("Unix: 親ディレクトリへの相対パス (../)", () => {
+    expect(resolveLocalPath("/home/user/docs/sub/page.md", "../images/fig.png"))
+      .toBe("/home/user/docs/images/fig.png");
+  });
 });
