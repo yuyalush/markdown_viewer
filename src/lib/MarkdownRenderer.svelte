@@ -5,6 +5,7 @@
   import mermaid from "mermaid";
   import type { Heading } from "./Sidebar.svelte";
   import { resolveLocalPath } from "./pathUtils";
+  import { resolveGithubPath, buildRawUrl } from "./github";
 
   // Mermaid 初期化（一度だけ）
   mermaid.initialize({ startOnLoad: false, theme: "default" });
@@ -16,6 +17,8 @@
     searchCaseSensitive?: boolean;
     sanitize?: boolean;
     darkMode?: boolean;
+    githubInfo?: { owner: string; repo: string; branch: string } | null;
+    githubCurrentPath?: string | null;
     onUpdateHeadings: (headings: Heading[]) => void;
     onUpdateActiveHeading: (id: string) => void;
     onSearchStatusChange?: (matchCount: number, currentIndex: number) => void;
@@ -29,6 +32,8 @@
     searchCaseSensitive = false,
     sanitize = false,
     darkMode = false,
+    githubInfo = null,
+    githubCurrentPath = null,
     onUpdateHeadings,
     onUpdateActiveHeading,
     onSearchStatusChange,
@@ -199,6 +204,25 @@
       ) return;
       const absolutePath = resolveLocalPath(currentFilePath, src);
       img.src = convertFileSrc(absolutePath);
+    });
+  });
+
+  // GitHub モード: 相対パス画像を raw.githubusercontent.com URL に変換
+  $effect(() => {
+    const _track = renderedHtml;
+    if (!containerEl || !githubInfo || !githubCurrentPath) return;
+    containerEl.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+      if (
+        src.startsWith("http://") ||
+        src.startsWith("https://") ||
+        src.startsWith("data:") ||
+        src.startsWith("asset://") ||
+        src.startsWith("//")
+      ) return;
+      const resolvedPath = resolveGithubPath(githubCurrentPath, src);
+      img.src = buildRawUrl(githubInfo.owner, githubInfo.repo, githubInfo.branch, resolvedPath);
     });
   });
 

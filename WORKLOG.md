@@ -45,6 +45,67 @@
 
 ---
 
+### [3] GitHub モード時の相対パス画像が表示されない問題を修正（2026-03-29）
+
+**指示**: GitHub リポジトリを指定して表示したとき、Markdown 内の相対パス画像（例: `docs/architecture.svg`）が表示されなかった。GitHub 上のリンクが `https://github.com/.../blob/main/docs/architecture.svg`（HTML ページ）になっており、SVG バイナリが取得できていなかった。
+
+**実施内容**:
+- 原因: GitHub モード時は `currentFilePath` が `null` のため既存のローカル画像変換 `$effect` が動作せず、相対 src が未解決のまま残っていた
+- `src/lib/MarkdownRenderer.svelte` に GitHub モード専用の画像変換 `$effect` を追加:
+  - Props に `githubInfo` と `githubCurrentPath` を追加
+  - `resolveGithubPath` で現在のファイルパス基準に相対パスを解決し、`buildRawUrl` で `raw.githubusercontent.com` URL を生成して `img.src` に設定
+- `src/App.svelte` の `<MarkdownRenderer>` に `githubInfo` / `githubCurrentPath` props を追加
+
+**作成・変更ファイル**:
+- `src/lib/MarkdownRenderer.svelte` — Props 追加・GitHub 画像変換 `$effect` 追加・`github.ts` からのインポート追加
+- `src/App.svelte` — `<MarkdownRenderer>` に `githubInfo` / `githubCurrentPath` props を渡すよう変更
+
+---
+
+### [4] テスト環境のセットアップ（2026-03-29）
+
+**指示**: テスト用の準備をしてください。
+
+**実施内容**:
+- Vitest (v4) および happy-dom を devDependencies に追加
+- `vite.config.ts` に `test` セクションを追加（environment: happy-dom、css: false）
+- `package.json` に `test` / `test:watch` スクリプトを追加
+- 以下の純粋関数を対象にユニットテストを作成（合計 27 テスト、全 PASS）:
+  - `pathUtils.ts` → `resolveLocalPath` (5 テスト)
+  - `github.ts` → `parseGitHubUrl`, `resolveGithubPath`, `buildRawUrl` (11 テスト)
+  - `markdownParser.ts` → `renderMarkdown`, `renderMarkdownSafe` (11 テスト)
+- GitHub 画像修正シナリオ（README.md 内の `docs/architecture.svg` → raw URL 変換）も専用テストで検証
+
+**作成・変更ファイル**:
+- `vite.config.ts` — Vitest 設定追加（import も `vitest/config` に変更）
+- `package.json` — `test` / `test:watch` スクリプト追加・vitest / happy-dom を devDependencies に追加
+- `src/lib/__tests__/pathUtils.test.ts` — 新規作成
+- `src/lib/__tests__/github.test.ts` — 新規作成
+- `src/lib/__tests__/markdownParser.test.ts` — 新規作成
+
+---
+
+### [5] v0.1.1 リリースビルド作成（2026-03-29）
+
+**指示**: 改めてリリースの作成を行ってください。
+
+**実施内容**:
+- `package.json` / `src-tauri/Cargo.toml` / `src-tauri/tauri.conf.json` のバージョンを `0.1.0` → `0.1.1` に更新
+- `pnpm test` で 27 テスト全 PASS を確認後にリリースビルドを実行
+- フロントエンド（Vite）プロダクションビルド完了
+- Rust release プロファイルでコンパイル完了（約 1 分 47 秒）
+- MSI インストーラーおよび NSIS セットアップ EXE を生成
+
+**作成・変更ファイル**:
+- `package.json` — バージョン `0.1.1` に更新
+- `src-tauri/Cargo.toml` — バージョン `0.1.1` に更新
+- `src-tauri/tauri.conf.json` — バージョン `0.1.1` に更新
+- `src-tauri/target/release/markdown-viewer.exe` — リリース実行ファイル
+- `src-tauri/target/release/bundle/msi/Markdown Viewer_0.1.1_x64_en-US.msi` — MSI インストーラー
+- `src-tauri/target/release/bundle/nsis/Markdown Viewer_0.1.1_x64-setup.exe` — NSIS セットアップ EXE
+
+---
+
 ## 2026-03-26
 
 ### [1] 開発環境セットアップ（2026-03-26）

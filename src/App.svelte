@@ -414,6 +414,8 @@
       sanitize={isGithubMode}
       {darkMode}
       currentFilePath={filePath}
+      githubInfo={isGithubMode ? githubInfo : null}
+      githubCurrentPath={isGithubMode ? githubCurrentPath : null}
       searchQuery={showSearch ? searchQuery : ""}
       searchCaseSensitive={searchCaseSensitive}
       onOpenRelativeFile={handleOpenRelativeFile}
