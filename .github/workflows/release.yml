@@ -19,6 +19,12 @@ jobs:
           - target: aarch64-pc-windows-msvc
             os: windows-latest
             label: arm64
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            label: x64
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            label: arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -55,6 +61,8 @@ jobs:
             |------|---------|
             | Windows x64 (一般的なPC) | `*_x64_en-US.msi` または `*_x64-setup.exe` |
             | Windows ARM64 (Surface Pro X, Snapdragonなど) | `*_arm64_en-US.msi` または `*_arm64-setup.exe` |
+            | macOS x64 (Intel Mac) | `*_x64.dmg` |
+            | macOS ARM64 (Apple Silicon M1/M2/M3) | `*_aarch64.dmg` |
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
