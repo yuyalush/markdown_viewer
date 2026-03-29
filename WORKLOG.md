@@ -145,6 +145,18 @@
 **作成・変更ファイル**:
 - `.github/workflows/release.yml` — 新規作成（タグ push 時の x64/ARM64 自動リリースワークフロー）
 
+
+### [8] MacOS向けリリース対応（2026-03-29）
+
+**指示**: release.ymlにmacOSターゲット（x86_64-apple-darwin、aarch64-apple-darwin）を追加してほしい
+
+**実施内容**:
+- `.github/workflows/release.yml` のmatrixにmacOSターゲット2種を追加
+- releaseBodyのインストール方法テーブルにmacOS向け行を追加
+
+**作成・変更ファイル**:
+- `.github/workflows/release.yml` — macOSターゲット（Intel/Apple Silicon）をmatrixとリリースノートに追加
+
 ---
 
 ## 2026-03-26
@@ -798,15 +810,3 @@
 - `src-tauri/src/lib.rs` - PendingFiles/get_initial_file/option_env!削除、base64ラベル方式に変更、devtools自動起動追加
 - `src/App.svelte` - get_initial_fileのIPC呼び出しを廃止、ラベルから直接デコードに変更
 
----
-
-### [1] MacOS向けリリース対応（2026-03-29）
-
-**指示**: release.yamlにmacOSターゲット（x86_64-apple-darwin、aarch64-apple-darwin）を追加してほしい
-
-**実施内容**:
-- `.github/workflows/release.yml` のmatrixにmacOSターゲット2種を追加
-- releaseBodyのインストール方法テーブルにmacOS向け行を追加
-
-**作成・変更ファイル**:
-- `.github/workflows/release.yml` — macOSターゲット（Intel/Apple Silicon）をmatrixとリリースノートに追加
