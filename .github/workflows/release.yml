@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            label: x64
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            label: arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: ${{ github.ref_name }}
+          releaseBody: |
+            ## インストール方法
+            お使いの環境に合わせてインストーラーをダウンロードしてください。
+
+            | 環境 | ファイル |
+            |------|---------|
+            | Windows x64 (一般的なPC) | `*_x64_en-US.msi` または `*_x64-setup.exe` |
+            | Windows ARM64 (Surface Pro X, Snapdragonなど) | `*_arm64_en-US.msi` または `*_arm64-setup.exe` |
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}
