@@ -7,5 +7,6 @@
 export function resolveLocalPath(currentFilePath: string, href: string): string {
   const normalized = currentFilePath.replace(/\\/g, "/");
   const resolved = new URL(href, `file:///${normalized}`);
-  return decodeURIComponent(resolved.pathname.slice(1));
+  const path = resolved.pathname;
+  return decodeURIComponent(/^\/[A-Za-z]:\//.test(path) ? path.slice(1) : path);
 }
