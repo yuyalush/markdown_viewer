@@ -124,6 +124,29 @@
 
 ---
 
+### [7] GitHub Actions リリース自動化 & v0.1.1 公開（2026-03-29）
+
+**指示**: x86_64 版と ARM64 版の二つをリリースタグ付け時に自動公開できるようにし、v0.1.1 を両プラットフォーム対応として公開してほしい。
+
+**実施内容**:
+- `.github/workflows/release.yml` を作成（`v*` タグ push 時に x64・ARM64 を並列ビルドして GitHub Release に自動添付）
+- `tauri-apps/tauri-action@v0` を使用、matrix で `x86_64-pc-windows-msvc` と `aarch64-pc-windows-msvc` を並列実行
+- ワークフローをコミットして `master` に push
+- `v0.1.1` タグを push して GitHub Actions を起動
+- ローカルビルド済み成果物（4ファイル）を `gh release create` で即時公開
+- リリース URL: https://github.com/yuyalush/markdown_viewer/releases/tag/v0.1.1
+
+**公開アセット**:
+- `Markdown.Viewer_0.1.1_x64_en-US.msi` (5.00 MiB)
+- `Markdown.Viewer_0.1.1_x64-setup.exe` (3.95 MiB)
+- `Markdown.Viewer_0.1.1_arm64_en-US.msi` (4.85 MiB)
+- `Markdown.Viewer_0.1.1_arm64-setup.exe` (3.74 MiB)
+
+**作成・変更ファイル**:
+- `.github/workflows/release.yml` — 新規作成（タグ push 時の x64/ARM64 自動リリースワークフロー）
+
+---
+
 ## 2026-03-26
 
 ### [1] 開発環境セットアップ（2026-03-26）
