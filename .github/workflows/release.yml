@@ -50,6 +50,14 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS コード署名・ノータリゼーション用シークレット
+          # Apple Developer Program の証明書を取得後、GitHub Secrets に設定して有効化してください。
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: ${{ github.ref_name }}
@@ -63,6 +71,21 @@ jobs:
             | Windows ARM64 (Surface Pro X, Snapdragonなど) | `*_arm64_en-US.msi` または `*_arm64-setup.exe` |
             | macOS x64 (Intel Mac) | `*_x64.dmg` |
             | macOS ARM64 (Apple Silicon M1/M2/M3) | `*_aarch64.dmg` |
+
+            ## ⚠️ macOS をお使いの方へ（重要）
+
+            このリリースは Apple Developer 証明書による署名・ノータリゼーションが行われていないため、
+            ダウンロード直後に「壊れているため開けません」と表示される場合があります。
+
+            **回避方法（ターミナルで実行）:**
+            ```sh
+            # DMG の場合
+            xattr -cr ~/Downloads/Markdown\ Viewer_*.dmg
+
+            # .app をインストール後の場合
+            xattr -cr /Applications/Markdown\ Viewer.app
+            ```
+            その後、右クリック → 「開く」を選択してください。
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
