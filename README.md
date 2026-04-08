@@ -1,8 +1,10 @@
 # Markdown Viewer
 
-Windows 向けの軽量デスクトップ Markdown ビューア。ローカルファイルの閲覧・自動リロードと、GitHub リポジトリのオンライン閲覧を GitHub スタイルで快適に行うことに特化したアプリです。
+軽量デスクトップ Markdown ビューア。ローカルファイルの閲覧・自動リロードと、GitHub リポジトリのオンライン閲覧を GitHub スタイルで快適に行うことに特化したアプリです。
+Windows版（Intel64版、ARM64版）とMacOS版（Intel版、ARM版）のリリースを行っています。
+当リポジトリの右側にあるReleaseよりインストーラー形式をダウンロードできます。
 
-**Tauri v2 + Svelte 5 + TypeScript + Rust** で構築されています。
+このアプリケーションは**Tauri v2 + Svelte 5 + TypeScript + Rust** で構築されています。
 
 ---
 
