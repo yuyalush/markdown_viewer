@@ -241,6 +241,11 @@ markdown-viewer/
   → KaTeX: インライン `$...$` / ブロック `$$...$$`
 - [x] 検索の大文字小文字区別オプション  
   → `SearchBar` に `Aa` チェックボックスを追加。`applyHighlights()` に `caseSensitive` 引数追加
+- [x] 自動アップデート（起動時バージョンチェック＆インストール）  
+  → `tauri-plugin-updater` + `tauri-plugin-process` を使用  
+  → 起動時に GitHub Releases の `latest.json` を参照してバージョン比較  
+  → 新バージョンがある場合はダイアログ表示 → ユーザー確認後 `downloadAndInstall()` + `relaunch()`  
+  → リリース時は `TAURI_SIGNING_PRIVATE_KEY` で署名し `latest.json` を自動生成（`tauri-apps/tauri-action`）
 - [ ] 設定画面（UI）
 - [ ] スタイルテーマの切り替え（将来拡張ポイント）
 

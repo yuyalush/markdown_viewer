@@ -4,6 +4,40 @@
 
 ---
 
+## 2026-04-13
+
+### [1] 自動アップデート機能の実装（2026-04-13）
+
+**指示**: 起動時にGitHubのこのリポジトリをチェックし、使用しているバージョンよりも新しいバージョンがリリースされていたら自動的にダウンロードして更新が行われるようにしたい。
+
+**実施内容**:
+- `tauri-plugin-updater` および `tauri-plugin-process` を Rust 依存に追加
+- `lib.rs` にプラグイン登録（`tauri_plugin_updater::Builder::new().build()` および `tauri_plugin_process::init()`）
+- `tauri.conf.json` に updater 設定を追加（エンドポイント: GitHub Releases の `latest.json`、公開鍵設定）
+- `capabilities/default.json` に updater/process 権限を追加（`updater:default`、`updater:allow-check`、`updater:allow-download-and-install`、`process:allow-relaunch`）
+- `@tauri-apps/plugin-updater` および `@tauri-apps/plugin-process` を JS 依存に追加
+- `src/lib/UpdateDialog.svelte` を新規作成（アップデート通知・確認ダイアログ）
+- `src/App.svelte` にアップデート確認ロジックを追加（起動時に `check()` を呼び出し、利用可能な場合はダイアログ表示 → `downloadAndInstall()` + `relaunch()`）
+- `.github/workflows/release.yml` に `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` 環境変数と `updaterJsonPreferNsis: true` を追加
+
+**注意事項（セットアップ手順）**:
+- GitHub リポジトリの Settings → Secrets に以下を設定すること:
+  - `TAURI_SIGNING_PRIVATE_KEY`: 生成した秘密鍵（`tauri signer generate` で生成）
+  - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`: 秘密鍵のパスワード（未設定の場合は空文字）
+- 公開鍵は `tauri.conf.json` の `plugins.updater.pubkey` に設定済み
+
+**作成・変更ファイル**:
+- `src-tauri/Cargo.toml` — `tauri-plugin-updater = "2"` / `tauri-plugin-process = "2"` 追加
+- `src-tauri/src/lib.rs` — プラグイン登録追加
+- `src-tauri/tauri.conf.json` — `plugins.updater` セクション追加
+- `src-tauri/capabilities/default.json` — updater/process 権限追加
+- `package.json` / `pnpm-lock.yaml` — `@tauri-apps/plugin-updater` / `@tauri-apps/plugin-process` 追加
+- `src/lib/UpdateDialog.svelte` — 新規作成
+- `src/App.svelte` — アップデート確認・インストールロジック追加
+- `.github/workflows/release.yml` — 署名設定・`updaterJsonPreferNsis` 追加
+
+---
+
 ## 2026-03-30
 
 ### [3] GitHub Actions ビルドの macOS「壊れている」問題を調査・暫定対応（2026-03-30）
