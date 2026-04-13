@@ -9,6 +9,7 @@
   import MarkdownRenderer from "./lib/MarkdownRenderer.svelte";
   import SearchBar from "./lib/SearchBar.svelte";
   import GitHubDialog from "./lib/GitHubDialog.svelte";
+  import CopilotPane from "./lib/CopilotPane.svelte";
   import type { Heading } from "./lib/Sidebar.svelte";
   import { applyTheme } from "./lib/theme";
   import {
@@ -46,6 +47,9 @@
   // 設定
   let showSettings = $state(false);
   let contentPadding = $state(8);
+
+  // Copilot ペイン
+  let copilotOpen = $state(false);
 
   // GitHub モード
   let showGithubDialog = $state(false);
@@ -300,6 +304,11 @@
     localStorage.setItem("contentPadding", String(v));
   }
 
+  function toggleCopilot() {
+    copilotOpen = !copilotOpen;
+    localStorage.setItem("copilotOpen", String(copilotOpen));
+  }
+
   onMount(() => {
     // テーマ復元（同期処理はここで直接実行）
     const saved = localStorage.getItem("darkMode");
@@ -308,6 +317,9 @@
 
     const savedPadding = localStorage.getItem("contentPadding");
     if (savedPadding !== null) contentPadding = Number(savedPadding);
+
+    const savedCopilot = localStorage.getItem("copilotOpen");
+    if (savedCopilot !== null) copilotOpen = savedCopilot === "true";
 
     let unlisten: (() => void) | undefined;
     let unlistenDrop: (() => void) | undefined;
@@ -350,6 +362,7 @@
     {showSearch}
     {showSettings}
     {isGithubMode}
+    {copilotOpen}
     onToggleDark={toggleDark}
     onToggleSidebar={() => (sidebarOpen = !sidebarOpen)}
     onOpenFile={() => openFile()}
@@ -358,6 +371,7 @@
     onToggleSearch={toggleSearch}
     onToggleSettings={toggleSettings}
     onOpenGithubRepo={openGithubDialog}
+    onToggleCopilot={toggleCopilot}
   />
   {#if showSettings}
     <div class="settings-bar">
@@ -426,6 +440,9 @@
       onUpdateHeadings={(h) => (headings = h)}
       onUpdateActiveHeading={(id) => (activeHeadingId = id)}
     />
+    {#if copilotOpen}
+      <CopilotPane />
+    {/if}
   </div>
 </div>
 

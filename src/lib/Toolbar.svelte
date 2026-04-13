@@ -7,6 +7,7 @@
     showSearch: boolean;
     showSettings: boolean;
     isGithubMode: boolean;
+    copilotOpen: boolean;
     onToggleDark: () => void;
     onToggleSidebar: () => void;
     onOpenFile: () => void;
@@ -15,6 +16,7 @@
     onToggleSearch: () => void;
     onToggleSettings: () => void;
     onOpenGithubRepo: () => void;
+    onToggleCopilot: () => void;
   }
 
   const {
@@ -25,6 +27,7 @@
     showSearch,
     showSettings,
     isGithubMode,
+    copilotOpen,
     onToggleDark,
     onToggleSidebar,
     onOpenFile,
@@ -33,6 +36,7 @@
     onToggleSearch,
     onToggleSettings,
     onOpenGithubRepo,
+    onToggleCopilot,
   }: Props = $props();
 </script>
 
@@ -52,6 +56,11 @@
       </svg>
     </button>
     <button onclick={onToggleSearch} class:active={showSearch} title="ドキュメント内検索">🔍</button>
+    <button onclick={onToggleCopilot} class:active={copilotOpen} title="M365 Copilot ペインを開く/閉じる">
+      <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" style="display:block">
+        <path d="M10 2a8 8 0 1 1 0 16A8 8 0 0 1 10 2Zm0 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 2.25a.75.75 0 0 1 .75.75v3.44l1.97 1.97a.75.75 0 1 1-1.06 1.06l-2.25-2.25A.75.75 0 0 1 9.25 10V6.5A.75.75 0 0 1 10 5.75Z"/>
+      </svg>
+    </button>
     <button onclick={onToggleDark} title={darkMode ? "ライトモードに切替" : "ダークモードに切替"}>
       {darkMode ? "🌙" : "☀"}
     </button>

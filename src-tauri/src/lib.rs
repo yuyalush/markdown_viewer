@@ -2,7 +2,7 @@ use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 
 /// ウィンドウラベルをキーとするウォッチャマップ（ウィンドウごとに独立した監視を行う）
 struct WatcherState(Mutex<HashMap<String, RecommendedWatcher>>);
@@ -82,6 +82,71 @@ fn list_md_files(dir: String) -> Result<Vec<String>, String> {
     Ok(files)
 }
 
+/// M365 Copilot ペインを開く（既に存在する場合は位置・サイズを更新する）
+#[tauri::command]
+fn open_copilot_pane(
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+    app: AppHandle,
+) -> Result<(), String> {
+    // 既存の copilot webview がある場合はリサイズのみ
+    if let Some(webview) = app.get_webview("copilot") {
+        webview
+            .set_position(tauri::LogicalPosition::new(x, y))
+            .map_err(|e| e.to_string())?;
+        webview
+            .set_size(tauri::LogicalSize::new(width, height))
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+
+    let window = app.get_window("main").ok_or("main window not found")?;
+    let url = "https://m365.cloud.microsoft/chat"
+        .parse::<url::Url>()
+        .map_err(|e| e.to_string())?;
+
+    window
+        .add_child(
+            tauri::WebviewBuilder::new("copilot", tauri::WebviewUrl::External(url)),
+            tauri::LogicalPosition::new(x, y),
+            tauri::LogicalSize::new(width, height),
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+/// M365 Copilot ペインを閉じる
+#[tauri::command]
+fn close_copilot_pane(app: AppHandle) -> Result<(), String> {
+    if let Some(webview) = app.get_webview("copilot") {
+        webview.close().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+/// M365 Copilot ペインの位置・サイズを更新する
+#[tauri::command]
+fn resize_copilot_pane(
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+    app: AppHandle,
+) -> Result<(), String> {
+    if let Some(webview) = app.get_webview("copilot") {
+        webview
+            .set_position(tauri::LogicalPosition::new(x, y))
+            .map_err(|e| e.to_string())?;
+        webview
+            .set_size(tauri::LogicalSize::new(width, height))
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -93,6 +158,9 @@ pub fn run() {
             get_cli_open_path,
             watch_file,
             list_md_files,
+            open_copilot_pane,
+            close_copilot_pane,
+            resize_copilot_pane,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")

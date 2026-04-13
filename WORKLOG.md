@@ -883,3 +883,28 @@
 - `src-tauri/src/lib.rs` - PendingFiles/get_initial_file/option_env!削除、base64ラベル方式に変更、devtools自動起動追加
 - `src/App.svelte` - get_initial_fileのIPC呼び出しを廃止、ラベルから直接デコードに変更
 
+
+---
+
+## 2026-04-13
+
+### [1] M365 Copilot ペインの試験実装（2026-04-13）
+
+**指示**: 現在の画面構成に独立したペインを追加し、M365 Copilot を表示させる試験実装
+
+**実施内容**:
+- `src-tauri/Cargo.toml` に `url = "2"` 依存と tauri の `"unstable"` フィーチャを追加（子 webview API に必要）
+- `src-tauri/src/lib.rs` に 3 つの Tauri コマンドを追加
+  - `open_copilot_pane(x, y, width, height)` — 子 webview を作成して M365 Copilot を表示
+  - `close_copilot_pane()` — 子 webview を閉じる
+  - `resize_copilot_pane(x, y, width, height)` — 子 webview の位置・サイズを更新
+- `src/lib/CopilotPane.svelte` を新規作成 — ペインのヘッダ UI と子 webview のライフサイクル管理
+- `src/lib/Toolbar.svelte` に Copilot トグルボタン（時計アイコン）を追加
+- `src/App.svelte` に `copilotOpen` 状態管理・`toggleCopilot()` 関数・localStorage 永続化を追加
+
+**作成・変更ファイル**:
+- `src-tauri/Cargo.toml` — `url = "2"` 追加、tauri `"unstable"` フィーチャ追加
+- `src-tauri/src/lib.rs` — `open_copilot_pane` / `close_copilot_pane` / `resize_copilot_pane` コマンド追加
+- `src/lib/CopilotPane.svelte` — 新規作成（Copilot ペインコンポーネント）
+- `src/lib/Toolbar.svelte` — `copilotOpen` prop・`onToggleCopilot` コールバック・ボタン追加
+- `src/App.svelte` — `copilotOpen` 状態・`toggleCopilot()` 関数・`CopilotPane` レンダリング追加
