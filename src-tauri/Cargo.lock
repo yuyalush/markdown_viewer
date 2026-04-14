@@ -2119,6 +2119,7 @@ name = "markdown-viewer"
 version = "0.1.3"
 dependencies = [
  "notify",
+ "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
