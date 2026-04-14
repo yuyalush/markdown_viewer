@@ -22,6 +22,8 @@ Windows版（Intel64版、ARM64版）とMacOS版（Intel版、ARM版）のリリ
 | ダーク / ライトモード | GitHub スタイルの両テーマをワンクリックで切替・永続化 |
 | マージン設定 | メインペインの左右余白比率をスライダーで調整・永続化 |
 | KaTeX 数式 | インライン `$...$` / ブロック `$$...$$` に対応 |
+| AI ペイン | Copilot・ChatGPT・Gemini 等の AI サービスをアプリ内サイドペインで表示 |
+| 自動アップデート | 起動時に GitHub Releases を確認し、新バージョンがあれば通知・自動インストール |
 | Mermaid 図表 | コードブロック ` ```mermaid ` で図表を描画 |
 | 拡張 Markdown | タスクリスト・脚注・シンタックスハイライトをサポート |
 
@@ -113,6 +115,21 @@ pnpm tauri build
 2. GitHub リポジトリ URL を入力（例: `https://github.com/owner/repo`）
 3. README.md が自動表示され、左サイドバーに全 `.md` ファイルが一覧表示される
 
+### AI ペインを使う
+
+1. ツールバーの **🤖（ロボット）ボタン**をクリックしてサイドペインを開く
+2. ペイン上部のドロップダウンから使用する AI サービスを選択（Copilot / ChatGPT / Gemini 等）
+3. AI サービスのページがペイン内に表示される。Markdown を読みながら AI に質問できる
+4. ペイン幅はドラッグで調整可能。もう一度ボタンを押すと閉じる
+
+> **注意:** AI サービスのページを表示するだけです。各サービスへのログインはブラウザのクッキーが利用される場合があります。
+
+### 自動アップデート
+
+- 起動時に GitHub Releases を自動確認します
+- 新バージョンが見つかると通知ダイアログが表示され、「インストール」を選ぶと自動ダウンロード・インストール後にアプリが再起動します
+- インストールを「後で」選択した場合、その起動中は再通知されません
+
 ### キーボードショートカット
 
 | キー | 動作 |
@@ -142,6 +159,8 @@ markdown-viewer/
 │       ├── MarkdownRenderer.svelte  # Markdown レンダリング・検索・Mermaid
 │       ├── SearchBar.svelte     # ドキュメント内検索バー
 │       ├── GitHubDialog.svelte  # GitHub URL 入力モーダルダイアログ
+│       ├── CopilotPane.svelte   # AI サービスサイドペイン（複数サービス切替）
+│       ├── UpdateDialog.svelte  # 自動アップデート通知ダイアログ
 │       ├── markdownParser.ts    # markdown-it 設定・KaTeX・拡張プラグイン
 │       ├── theme.ts             # ライト/ダークテーマ切替ユーティリティ
 │       ├── github.ts            # GitHub API ユーティリティ（fetch・URL解決）

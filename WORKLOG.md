@@ -54,6 +54,22 @@
 **作成・変更ファイル**:
 - `src-tauri/capabilities/default.json` — `process:allow-relaunch` → `process:allow-restart` 再修正
 
+### [2] README.md への AI ペイン・自動更新記述追加、v0.1.4 リリース（2026-04-14）
+
+**指示**: AI ペインの追加と設定、自動更新に関する記述を README.md に追加し、v0.1.4 のリリースを行う。
+
+**実施内容**:
+- `README.md` の機能テーブルに「AI ペイン」「自動アップデート」の行を追加
+- 「AI ペインを使う」「自動アップデート」のセクションを使い方に追記
+- プロジェクト構成に `CopilotPane.svelte` / `UpdateDialog.svelte` の記述を追加
+- `tauri.conf.json` と `package.json` のバージョンを `0.1.3` → `0.1.4` に更新
+- 変更をコミット・push し、`v0.1.4` タグを打って GitHub Actions でリリースを起動
+
+**作成・変更ファイル**:
+- `README.md` — AI ペイン・自動更新の機能説明・使い方・プロジェクト構成に追記
+- `src-tauri/tauri.conf.json` — version `0.1.3` → `0.1.4`
+- `package.json` — version `0.1.3` → `0.1.4`
+
 ---
 
 ## 2026-03-30
