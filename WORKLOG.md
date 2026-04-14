@@ -886,25 +886,39 @@
 
 ---
 
-## 2026-04-13
+## 2026-04-13〜14
 
-### [1] M365 Copilot ペインの試験実装（2026-04-13）
+### [1] AI ペインの実装（2026-04-13〜14）
 
-**指示**: 現在の画面構成に独立したペインを追加し、M365 Copilot を表示させる試験実装
+**指示**: 画面右側に AI サービスを表示するペインを追加してほしい。当初は M365 Copilot を対象としたが、最終的に複数サービス（Microsoft Copilot / Claude / ChatGPT）を切り替えられる仕様に変更
 
-**実施内容**:
-- `src-tauri/Cargo.toml` に `url = "2"` 依存と tauri の `"unstable"` フィーチャを追加（子 webview API に必要）
-- `src-tauri/src/lib.rs` に 3 つの Tauri コマンドを追加
-  - `open_copilot_pane(x, y, width, height)` — 子 webview を作成して M365 Copilot を表示
-  - `close_copilot_pane()` — 子 webview を閉じる
-  - `resize_copilot_pane(x, y, width, height)` — 子 webview の位置・サイズを更新
-- `src/lib/CopilotPane.svelte` を新規作成 — ペインのヘッダ UI と子 webview のライフサイクル管理
-- `src/lib/Toolbar.svelte` に Copilot トグルボタン（時計アイコン）を追加
-- `src/App.svelte` に `copilotOpen` 状態管理・`toggleCopilot()` 関数・localStorage 永続化を追加
+**実装**:
+- Tauri の `unstable` feature (`add_child` API) を利用し、メインウィンドウ内に子 WebView としてAIサービスを埋め込む構成を採用
+- Windows では `add_child` を同期コマンド内で呼ぶと deadlock が発生する（GitHub Issue #10010）ため、`open_copilot_pane` を `async fn` として定義
+- 子 WebView の位置・サイズは JS 側で `getBoundingClientRect()` を取得して Rust コマンドへ渡す。ビューポート座標をそのまま使えるためスクリーン座標変換は不要
+- ウィンドウ移動（`onMoved`）・リサイズ（`onResized`）・DOM レイアウト変化（`ResizeObserver`）それぞれで `resize_copilot_pane` を呼び位置を同期する
+- AIサービス切り替え時は Svelte の `{#key aiServiceId}` ブロックでコンポーネントを再マウントし、旧WebViewのクローズ→新URLでの再オープンを自動処理する
+- 選択中のAIサービスは `localStorage` で永続化
 
 **作成・変更ファイル**:
-- `src-tauri/Cargo.toml` — `url = "2"` 追加、tauri `"unstable"` フィーチャ追加
-- `src-tauri/src/lib.rs` — `open_copilot_pane` / `close_copilot_pane` / `resize_copilot_pane` コマンド追加
-- `src/lib/CopilotPane.svelte` — 新規作成（Copilot ペインコンポーネント）
-- `src/lib/Toolbar.svelte` — `copilotOpen` prop・`onToggleCopilot` コールバック・ボタン追加
-- `src/App.svelte` — `copilotOpen` 状態・`toggleCopilot()` 関数・`CopilotPane` レンダリング追加
+- `src-tauri/Cargo.toml` — `tauri` に `"unstable"` フィーチャ追加
+- `src-tauri/src/lib.rs` — `open_copilot_pane`（async）/ `close_copilot_pane` / `resize_copilot_pane` コマンド追加
+- `src/lib/CopilotPane.svelte` — 新規作成。AI ペインの UI・子 WebView ライフサイクル管理・ウィンドウイベント購読
+- `src/lib/Toolbar.svelte` — AI ペイントグルボタン（AI アイコン）追加
+- `src/App.svelte` — `AI_SERVICES` 定数・`aiServiceId` 状態・`{#key}` による再マウント・設定バーへのサービス選択 UI・localStorage 永続化を追加
+
+### [2] コードレビューとリファクタリング（2026-04-14）
+
+**指示**: ここまでのコードをすべてチェックしリファクタリング。不要な残骸を除去。WORKLOG.md の AI ペイン関連の中間経緯エントリを最終結果のみに集約
+
+**実施内容**:
+- `Cargo.toml`: デバッグ用に追加した `"devtools"` フィーチャを削除
+- `lib.rs`: コメント内の文字化け（`刵ウィンドウ` → `別ウィンドウ`）を修正。コマンド説明の "M365 Copilot" 固有表現を "AI ペイン" 汎用表現に変更
+- `App.svelte`: `aiServiceId` を `localStorage` に保存・復元（再起動後も選択が維持されるように）。AIサービス変更時のUI更新を `onAiServiceChange()` 関数に集約。`{#key aiServiceId}` ブロックを追加し、サービス変更時に `CopilotPane` が自動再マウント（旧WebViewをクローズして新URLで再オープン）されるよう修正
+- `WORKLOG.md`: 2026-04-13〜14 の AI ペイン関連エントリ 13 件を最終状態のみの 1 件に集約
+
+**作成・変更ファイル**:
+- `src-tauri/Cargo.toml` — `"devtools"` フィーチャ削除
+- `src-tauri/src/lib.rs` — コメント修正（文字化け、M365→AI汎用化）
+- `src/App.svelte` — `aiServiceId` localStorage 永続化、`onAiServiceChange()` 追加、`{#key aiServiceId}` 追加
+- `WORKLOG.md` — AI ペインエントリ集約

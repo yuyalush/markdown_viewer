@@ -48,8 +48,22 @@
   let showSettings = $state(false);
   let contentPadding = $state(8);
 
-  // Copilot ペイン
+  // AI ペイン
+  const AI_SERVICES = [
+    { id: "copilot",  label: "Microsoft Copilot", url: "https://copilot.microsoft.com" },
+    { id: "claude",   label: "Claude",             url: "https://claude.ai" },
+    { id: "chatgpt",  label: "ChatGPT",            url: "https://chatgpt.com" },
+  ] as const;
+  type AiServiceId = typeof AI_SERVICES[number]["id"];
+
   let copilotOpen = $state(false);
+  let aiServiceId = $state<AiServiceId>("copilot");
+  const currentAiService = $derived(AI_SERVICES.find((s) => s.id === aiServiceId)!);
+
+  function onAiServiceChange(id: AiServiceId) {
+    aiServiceId = id;
+    localStorage.setItem("aiServiceId", id);
+  }
 
   // GitHub モード
   let showGithubDialog = $state(false);
@@ -318,6 +332,9 @@
     const savedPadding = localStorage.getItem("contentPadding");
     if (savedPadding !== null) contentPadding = Number(savedPadding);
 
+    const savedAiService = localStorage.getItem("aiServiceId") as AiServiceId | null;
+    if (savedAiService && AI_SERVICES.some((s) => s.id === savedAiService)) aiServiceId = savedAiService;
+
     const savedCopilot = localStorage.getItem("copilotOpen");
     if (savedCopilot !== null) copilotOpen = savedCopilot === "true";
 
@@ -386,6 +403,17 @@
         />
         <span class="settings-value">{contentPadding}%</span>
       </label>
+      <label class="settings-label">
+        AI サービス:
+        <select
+          value={aiServiceId}
+          onchange={(e) => onAiServiceChange((e.currentTarget as HTMLSelectElement).value as AiServiceId)}
+        >
+          {#each AI_SERVICES as s}
+            <option value={s.id}>{s.label}</option>
+          {/each}
+        </select>
+      </label>
     </div>
   {/if}
   {#if showGithubDialog}
@@ -441,7 +469,9 @@
       onUpdateActiveHeading={(id) => (activeHeadingId = id)}
     />
     {#if copilotOpen}
-      <CopilotPane />
+      {#key aiServiceId}
+        <CopilotPane url={currentAiService.url} label={currentAiService.label} />
+      {/key}
     {/if}
   </div>
 </div>
@@ -501,6 +531,16 @@
     width: 120px;
     cursor: pointer;
     accent-color: var(--sidebar-active-text);
+  }
+
+  .settings-label select {
+    background: var(--toolbar-bg, #fff);
+    color: var(--toolbar-text, #24292f);
+    border: 1px solid var(--toolbar-border, #d0d7de);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    cursor: pointer;
   }
 
   .settings-value {

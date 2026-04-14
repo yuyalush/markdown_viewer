@@ -56,9 +56,9 @@
       </svg>
     </button>
     <button onclick={onToggleSearch} class:active={showSearch} title="ドキュメント内検索">🔍</button>
-    <button onclick={onToggleCopilot} class:active={copilotOpen} title="M365 Copilot ペインを開く/閉じる">
+    <button onclick={onToggleCopilot} class:active={copilotOpen} title="AI ペインを開く/閉じる">
       <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" style="display:block">
-        <path d="M10 2a8 8 0 1 1 0 16A8 8 0 0 1 10 2Zm0 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 2.25a.75.75 0 0 1 .75.75v3.44l1.97 1.97a.75.75 0 1 1-1.06 1.06l-2.25-2.25A.75.75 0 0 1 9.25 10V6.5A.75.75 0 0 1 10 5.75Z"/>
+        <path d="M10 2.5c.28 0 .5.22.5.5v1a.5.5 0 0 1-1 0V3c0-.28.22-.5.5-.5Zm4.24 1.76a.5.5 0 0 1 0 .7l-.7.71a.5.5 0 1 1-.71-.7l.7-.71a.5.5 0 0 1 .71 0ZM17 9.5h-1a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1ZM10 15.5c.28 0 .5.22.5.5v1a.5.5 0 0 1-1 0v-1c0-.28.22-.5.5-.5Zm4.95-1.55.7.71a.5.5 0 1 1-.71.7l-.7-.7a.5.5 0 1 1 .71-.71ZM4 9.5H3a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1Zm1.76-5.24.7.71a.5.5 0 1 1-.7.7l-.71-.7a.5.5 0 1 1 .7-.71Zm.29 6.7a.5.5 0 0 1-.7-.7l.7-.71a.5.5 0 1 1 .71.7l-.71.71ZM10 6a4 4 0 0 1 2.47 7.17.5.5 0 0 1-.28.08H7.81a.5.5 0 0 1-.28-.08A4 4 0 0 1 10 6Zm-1.5 6.25h3c.14 0 .27.06.36.15A3 3 0 1 0 7.14 12.4c.09-.09.22-.15.36-.15Zm-.5 1.25h4a.5.5 0 0 1 0 1H8a.5.5 0 0 1 0-1Zm.5 1.75h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1Z"/>
       </svg>
     </button>
     <button onclick={onToggleDark} title={darkMode ? "ライトモードに切替" : "ダークモードに切替"}>

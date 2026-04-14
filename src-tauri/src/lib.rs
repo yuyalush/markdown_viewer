@@ -82,34 +82,38 @@ fn list_md_files(dir: String) -> Result<Vec<String>, String> {
     Ok(files)
 }
 
-/// M365 Copilot ペインを開く（既に存在する場合は位置・サイズを更新する）
+/// AI ペイン用子 WebView をメインウィンドウ内に追加して開く
+/// Windows では add_child を同期コマンド内で呼ぶと deadlock するため async が必須
 #[tauri::command]
-fn open_copilot_pane(
+async fn open_copilot_pane(
     x: f64,
     y: f64,
     width: f64,
     height: f64,
+    url: String,
     app: AppHandle,
 ) -> Result<(), String> {
-    // 既存の copilot webview がある場合はリサイズのみ
+    // 既存の copilot webview がある場合は位置・サイズを更新するのみ
     if let Some(webview) = app.get_webview("copilot") {
         webview
-            .set_position(tauri::LogicalPosition::new(x, y))
-            .map_err(|e| e.to_string())?;
-        webview
-            .set_size(tauri::LogicalSize::new(width, height))
+            .set_bounds(tauri::Rect {
+                position: tauri::Position::Logical(tauri::LogicalPosition::new(x, y)),
+                size: tauri::Size::Logical(tauri::LogicalSize::new(width, height)),
+            })
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
 
-    let window = app.get_window("main").ok_or("main window not found")?;
-    let url = "https://m365.cloud.microsoft/chat"
-        .parse::<url::Url>()
-        .map_err(|e| e.to_string())?;
+    let webview_url = tauri::WebviewUrl::External(
+        url.parse().map_err(|e: url::ParseError| e.to_string())?,
+    );
 
-    window
+    // メインウィンドウに子 WebView として追加（則出ウィンドウは作らない）
+    // x,y は JS の getBoundingClientRect() のビューポート座標 = ウィンドウ内論理座標のため変換不要
+    let main_win = app.get_window("main").ok_or("main window not found")?;
+    main_win
         .add_child(
-            tauri::WebviewBuilder::new("copilot", tauri::WebviewUrl::External(url)),
+            tauri::webview::WebviewBuilder::new("copilot", webview_url),
             tauri::LogicalPosition::new(x, y),
             tauri::LogicalSize::new(width, height),
         )
@@ -118,7 +122,7 @@ fn open_copilot_pane(
     Ok(())
 }
 
-/// M365 Copilot ペインを閉じる
+/// AI ペイン用子 WebView を閉じる（メインウィンドウはそのまま）
 #[tauri::command]
 fn close_copilot_pane(app: AppHandle) -> Result<(), String> {
     if let Some(webview) = app.get_webview("copilot") {
@@ -127,7 +131,7 @@ fn close_copilot_pane(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// M365 Copilot ペインの位置・サイズを更新する
+/// AI ペイン用子 WebView の位置・サイズを更新する
 #[tauri::command]
 fn resize_copilot_pane(
     x: f64,
@@ -136,14 +140,15 @@ fn resize_copilot_pane(
     height: f64,
     app: AppHandle,
 ) -> Result<(), String> {
-    if let Some(webview) = app.get_webview("copilot") {
-        webview
-            .set_position(tauri::LogicalPosition::new(x, y))
-            .map_err(|e| e.to_string())?;
-        webview
-            .set_size(tauri::LogicalSize::new(width, height))
-            .map_err(|e| e.to_string())?;
-    }
+    let Some(webview) = app.get_webview("copilot") else {
+        return Ok(());
+    };
+    webview
+        .set_bounds(tauri::Rect {
+            position: tauri::Position::Logical(tauri::LogicalPosition::new(x, y)),
+            size: tauri::Size::Logical(tauri::LogicalSize::new(width, height)),
+        })
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
