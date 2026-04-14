@@ -90,6 +90,24 @@
 - `package.json` — `@tauri-apps/plugin-dialog` を `^2.7.0` に変更
 - `pnpm-lock.yaml` — plugin-dialog 2.6.0 → 2.7.0 に更新
 
+### [4] v0.1.4 リリースファイルのバージョン番号修正（2026-04-14）
+
+**指示**: リリースページで配布ファイルのバージョンが 0.1.3 になっているため修正する。
+
+**原因**:
+- PR #8 のマージ時に `d3bd0f4`（バージョンバンプコミット）が master に取り込まれず、`tauri.conf.json`・`package.json`・`Cargo.toml` が全て `0.1.3` のまま残っていた
+- Tauri はインストーラのファイル名・バージョン情報を `tauri.conf.json` の `version` フィールドから生成するため、`0.1.3` で配布されていた
+
+**実施内容**:
+- `tauri.conf.json`・`package.json`・`src-tauri/Cargo.toml` の version を `0.1.3` → `0.1.4` に修正
+- コミット後に master を push
+- `v0.1.4` タグを削除・打ち直して GitHub Actions のリリースビルドを再起動
+
+**作成・変更ファイル**:
+- `src-tauri/tauri.conf.json` — version `0.1.3` → `0.1.4`
+- `package.json` — version `0.1.3` → `0.1.4`
+- `src-tauri/Cargo.toml` — version `0.1.3` → `0.1.4`
+
 ---
 
 ## 2026-03-30
