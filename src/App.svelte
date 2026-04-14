@@ -9,6 +9,7 @@
   import MarkdownRenderer from "./lib/MarkdownRenderer.svelte";
   import SearchBar from "./lib/SearchBar.svelte";
   import GitHubDialog from "./lib/GitHubDialog.svelte";
+  import CopilotPane from "./lib/CopilotPane.svelte";
   import type { Heading } from "./lib/Sidebar.svelte";
   import { applyTheme } from "./lib/theme";
   import {
@@ -46,6 +47,23 @@
   // 設定
   let showSettings = $state(false);
   let contentPadding = $state(8);
+
+  // AI ペイン
+  const AI_SERVICES = [
+    { id: "copilot",  label: "Microsoft Copilot", url: "https://copilot.microsoft.com" },
+    { id: "claude",   label: "Claude",             url: "https://claude.ai" },
+    { id: "chatgpt",  label: "ChatGPT",            url: "https://chatgpt.com" },
+  ] as const;
+  type AiServiceId = typeof AI_SERVICES[number]["id"];
+
+  let copilotOpen = $state(false);
+  let aiServiceId = $state<AiServiceId>("copilot");
+  const currentAiService = $derived(AI_SERVICES.find((s) => s.id === aiServiceId)!);
+
+  function onAiServiceChange(id: AiServiceId) {
+    aiServiceId = id;
+    localStorage.setItem("aiServiceId", id);
+  }
 
   // GitHub モード
   let showGithubDialog = $state(false);
@@ -300,6 +318,11 @@
     localStorage.setItem("contentPadding", String(v));
   }
 
+  function toggleCopilot() {
+    copilotOpen = !copilotOpen;
+    localStorage.setItem("copilotOpen", String(copilotOpen));
+  }
+
   onMount(() => {
     // テーマ復元（同期処理はここで直接実行）
     const saved = localStorage.getItem("darkMode");
@@ -308,6 +331,12 @@
 
     const savedPadding = localStorage.getItem("contentPadding");
     if (savedPadding !== null) contentPadding = Number(savedPadding);
+
+    const savedAiService = localStorage.getItem("aiServiceId") as AiServiceId | null;
+    if (savedAiService && AI_SERVICES.some((s) => s.id === savedAiService)) aiServiceId = savedAiService;
+
+    const savedCopilot = localStorage.getItem("copilotOpen");
+    if (savedCopilot !== null) copilotOpen = savedCopilot === "true";
 
     let unlisten: (() => void) | undefined;
     let unlistenDrop: (() => void) | undefined;
@@ -350,6 +379,7 @@
     {showSearch}
     {showSettings}
     {isGithubMode}
+    {copilotOpen}
     onToggleDark={toggleDark}
     onToggleSidebar={() => (sidebarOpen = !sidebarOpen)}
     onOpenFile={() => openFile()}
@@ -358,6 +388,7 @@
     onToggleSearch={toggleSearch}
     onToggleSettings={toggleSettings}
     onOpenGithubRepo={openGithubDialog}
+    onToggleCopilot={toggleCopilot}
   />
   {#if showSettings}
     <div class="settings-bar">
@@ -371,6 +402,17 @@
           oninput={(e) => onPaddingChange(Number((e.currentTarget as HTMLInputElement).value))}
         />
         <span class="settings-value">{contentPadding}%</span>
+      </label>
+      <label class="settings-label">
+        AI サービス:
+        <select
+          value={aiServiceId}
+          onchange={(e) => onAiServiceChange((e.currentTarget as HTMLSelectElement).value as AiServiceId)}
+        >
+          {#each AI_SERVICES as s}
+            <option value={s.id}>{s.label}</option>
+          {/each}
+        </select>
       </label>
     </div>
   {/if}
@@ -426,6 +468,11 @@
       onUpdateHeadings={(h) => (headings = h)}
       onUpdateActiveHeading={(id) => (activeHeadingId = id)}
     />
+    {#if copilotOpen}
+      {#key aiServiceId}
+        <CopilotPane url={currentAiService.url} label={currentAiService.label} />
+      {/key}
+    {/if}
   </div>
 </div>
 
@@ -484,6 +531,16 @@
     width: 120px;
     cursor: pointer;
     accent-color: var(--sidebar-active-text);
+  }
+
+  .settings-label select {
+    background: var(--toolbar-bg, #fff);
+    color: var(--toolbar-text, #24292f);
+    border: 1px solid var(--toolbar-border, #d0d7de);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    cursor: pointer;
   }
 
   .settings-value {
