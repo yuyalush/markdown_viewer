@@ -38,6 +38,24 @@
 
 ---
 
+## 2026-04-14
+
+### [1] PR #6 マージ後のコンフリクト解消・リモートへの push（2026-04-14）
+
+**指示**: 作業終わりました？（コンフリクト解消の続き）
+
+**実施内容**:
+- `capabilities/default.json` の `process:allow-relaunch` が rebase で revert されていたため `process:allow-restart` に再修正
+- `src/App.svelte`・`src-tauri/Cargo.lock`・スキーマファイルのコンフリクトマーカーがゼロであることを確認
+- 全ファイルを `git add` でステージング
+- `git rebase --continue` を実行して rebase 完了
+- `git push --force-with-lease origin copilot/auto-update-on-version-release` でリモートを更新
+
+**作成・変更ファイル**:
+- `src-tauri/capabilities/default.json` — `process:allow-relaunch` → `process:allow-restart` 再修正
+
+---
+
 ## 2026-03-30
 
 ### [3] GitHub Actions ビルドの macOS「壊れている」問題を調査・暫定対応（2026-03-30）
