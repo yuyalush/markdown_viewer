@@ -54,6 +54,42 @@
 **作成・変更ファイル**:
 - `src-tauri/capabilities/default.json` — `process:allow-relaunch` → `process:allow-restart` 再修正
 
+### [2] README.md への AI ペイン・自動更新記述追加、v0.1.4 リリース（2026-04-14）
+
+**指示**: AI ペインの追加と設定、自動更新に関する記述を README.md に追加し、v0.1.4 のリリースを行う。
+
+**実施内容**:
+- `README.md` の機能テーブルに「AI ペイン」「自動アップデート」の行を追加
+- 「AI ペインを使う」「自動アップデート」のセクションを使い方に追記
+- プロジェクト構成に `CopilotPane.svelte` / `UpdateDialog.svelte` の記述を追加
+- `tauri.conf.json` と `package.json` のバージョンを `0.1.3` → `0.1.4` に更新
+- PR #8 を squash merge 後に `v0.1.4` タグを push して GitHub Actions のリリースビルドを起動
+
+**作成・変更ファイル**:
+- `README.md` — AI ペイン・自動更新の機能説明・使い方・プロジェクト構成に追記
+- `src-tauri/tauri.conf.json` — version `0.1.3` → `0.1.4`
+- `package.json` — version `0.1.3` → `0.1.4`
+
+### [3] GitHub Actions v0.1.4 ビルド失敗の修正（2026-04-14）
+
+**指示**: 0.1.4 を打った GitHub Action が失敗しているので、原因を調べて修正を行ってください。
+
+**原因**:
+- `tauri-plugin-dialog` の版番号が Rust クレート (v2.7.0) と NPM パッケージ (v2.6.0) で minor バージョン不一致
+- Tauri CLI はビルド時に Rust/NPM プラグインの major.minor 一致を検証し、不一致の場合は即時エラーで終了する
+- その結果 GitHub Actions の `tauri-apps/tauri-action@v0` ステップが 2 秒で失敗していた
+
+**実施内容**:
+- `pnpm tauri build --no-bundle` を実行してバージョンミスマッチのエラーを特定
+- `package.json` の `@tauri-apps/plugin-dialog` を `^2` → `^2.7.0` に更新
+- `pnpm install` で `pnpm-lock.yaml` を 2.7.0 に更新
+- `pnpm tauri build --no-bundle` で修正後のビルドが成功することを確認
+- コミット後に `v0.1.4` タグを削除・打ち直して GitHub Actions を再起動
+
+**作成・変更ファイル**:
+- `package.json` — `@tauri-apps/plugin-dialog` を `^2.7.0` に変更
+- `pnpm-lock.yaml` — plugin-dialog 2.6.0 → 2.7.0 に更新
+
 ---
 
 ## 2026-03-30
