@@ -4,12 +4,15 @@
   import { listen } from "@tauri-apps/api/event";
   import { open } from "@tauri-apps/plugin-dialog";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { check, type Update } from "@tauri-apps/plugin-updater";
+  import { relaunch } from "@tauri-apps/plugin-process";
   import Toolbar from "./lib/Toolbar.svelte";
   import Sidebar from "./lib/Sidebar.svelte";
   import MarkdownRenderer from "./lib/MarkdownRenderer.svelte";
   import SearchBar from "./lib/SearchBar.svelte";
   import GitHubDialog from "./lib/GitHubDialog.svelte";
   import CopilotPane from "./lib/CopilotPane.svelte";
+  import UpdateDialog from "./lib/UpdateDialog.svelte";
   import type { Heading } from "./lib/Sidebar.svelte";
   import { applyTheme } from "./lib/theme";
   import {
@@ -64,6 +67,14 @@
     aiServiceId = id;
     localStorage.setItem("aiServiceId", id);
   }
+
+  // アップデート
+  let showUpdateDialog = $state(false);
+  let updateVersion = $state("");
+  let updateNotes = $state("");
+  let isUpdating = $state(false);
+  let updateError = $state<string | null>(null);
+  let pendingUpdate: Update | null = null;
 
   // GitHub モード
   let showGithubDialog = $state(false);
@@ -323,6 +334,38 @@
     localStorage.setItem("copilotOpen", String(copilotOpen));
   }
 
+  /** 起動時にアップデートを確認する */
+  async function checkForUpdates() {
+    try {
+      const update = await check();
+      if (update?.available) {
+        pendingUpdate = update;
+        updateVersion = update.version;
+        updateNotes = update.body ?? "";
+        showUpdateDialog = true;
+      }
+    } catch {
+      // アップデート確認失敗は無視（オフライン環境等）
+    }
+  }
+
+  /** アップデートをダウンロードしてインストールする */
+  async function installUpdate() {
+    showUpdateDialog = false;
+    isUpdating = true;
+    updateError = null;
+    try {
+      if (pendingUpdate?.available) {
+        await pendingUpdate.downloadAndInstall();
+        await relaunch();
+      }
+    } catch (err) {
+      updateError = `アップデートに失敗しました: ${err}`;
+    } finally {
+      isUpdating = false;
+    }
+  }
+
   onMount(() => {
     // テーマ復元（同期処理はここで直接実行）
     const saved = localStorage.getItem("darkMode");
@@ -358,6 +401,9 @@
 
         const cliPath = await invoke<string | null>("get_cli_open_path");
         if (cliPath) await openFile(cliPath);
+
+        // アップデート確認（初期ファイル読み込みより後に実行）
+        await checkForUpdates();
       } catch (e) {
         console.error("[App] init error:", e);
       }
@@ -416,6 +462,14 @@
       </label>
     </div>
   {/if}
+  {#if showUpdateDialog}
+    <UpdateDialog
+      version={updateVersion}
+      notes={updateNotes}
+      onConfirm={installUpdate}
+      onClose={() => (showUpdateDialog = false)}
+    />
+  {/if}
   {#if showGithubDialog}
     <GitHubDialog onConfirm={openGithubRepo} onClose={() => (showGithubDialog = false)} />
   {/if}
@@ -431,6 +485,12 @@
       onPrev={() => rendererRef?.goToPrevMatch()}
       onClose={toggleSearch}
     />
+  {/if}
+  {#if updateError}
+    <div class="error-banner" role="alert">{updateError}</div>
+  {/if}
+  {#if isUpdating}
+    <div class="loading-banner" role="status">アップデートをダウンロードしています…</div>
   {/if}
   {#if errorMessage}
     <div class="error-banner" role="alert">{errorMessage}</div>

@@ -50,6 +50,8 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # macOS コード署名・ノータリゼーション用シークレット
           # Apple Developer Program の証明書を取得後、GitHub Secrets に設定して有効化してください。
           # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -88,4 +90,5 @@ jobs:
             その後、右クリック → 「開く」を選択してください。
           releaseDraft: false
           prerelease: false
+          updaterJsonPreferNsis: true
           args: --target ${{ matrix.target }}
